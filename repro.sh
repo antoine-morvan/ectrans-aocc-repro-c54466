@@ -23,7 +23,7 @@ echo "## -- [ectrans_aocc_repro] start"
 COMPILER=AOCC # install 5.2.0
 # COMPILER=GCC #system GCC
 
-case "${@}" in
+case "${1:-}" in
     "--clean")
         while IFS= read -r -d '' folder_to_clean ; do
             echo "rm folder ${folder_to_clean}"
@@ -31,6 +31,9 @@ case "${@}" in
         done <  <(find "${REPRO_SCRIPT_DIR}" -mindepth 1 -maxdepth 1 -type d -print0)
         rm -v "${REPRO_SCRIPT_DIR}"/setenv_*.sh
         exit 0
+        ;;
+    GCC|AOCC)
+        COMPILER="${1}"
         ;;
 esac
 
@@ -428,7 +431,7 @@ echo "## -- [ectrans_aocc_repro] Failing test"
     source "${REPRO_SCRIPT_DIR}/setenv_fftw_${COMPILER}.sh"
 
     export OMP_NUM_THREADS=4
-    mpiexec -n 4 -- "${REPRO_SCRIPT_DIR}/${ECTRANS_DIR}/build_${COMPILER}/bin/ectrans-benchmark-cpu-sp" --norms -n 2 -l 137 -t 319 --vordiv --uvders --scders --check 1000
+    mpiexec -n 2 -- "${REPRO_SCRIPT_DIR}/${ECTRANS_DIR}/build_${COMPILER}/bin/ectrans-benchmark-cpu-sp" --norms -n 2 -l 137 -t 319 --vordiv --uvders --scders --check 1000
 )
 
 echo "## -- [ectrans_aocc_repro] end"
